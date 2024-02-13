@@ -1,4 +1,4 @@
-package main
+package form
 
 import (
 	"encoding/xml"
@@ -9,7 +9,7 @@ import (
 
 func TestHandleSchema_Unmarshal(t *testing.T) {
 
-	filePath := filepath.Join("schema", "form.xml")
+	filePath := filepath.Join("..", "..", "schema", "form.xml")
 
 	xmlData, err := os.ReadFile(filePath)
 	if err != nil {

@@ -1,4 +1,4 @@
-package main
+package form
 
 import (
 	"encoding/xml"
@@ -8,7 +8,7 @@ type Form struct {
 	XMLName    xml.Name  `xml:"Form"`
 	Fields     []Field   `xml:"Field"`
 	Sections   []Section `xml:"Section"`
-	schemaFile string
+	SchemaFile string
 }
 
 type Field struct {

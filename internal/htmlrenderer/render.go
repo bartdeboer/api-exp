@@ -1,43 +1,12 @@
-package main
+package htmlrenderer
 
 import (
-	"encoding/xml"
 	"fmt"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
+
+	"github.com/bartdeboer/api-exp/internal/form"
 )
 
-func handleSchema(w http.ResponseWriter, r *http.Request) {
-	filePath := r.URL.Path
-
-	if !strings.HasSuffix(filePath, ".xml") {
-		http.NotFound(w, r)
-		return
-	}
-
-	fullPath := filepath.Join("schema", filePath)
-
-	xmlData, err := os.ReadFile(fullPath)
-	if err != nil {
-		http.Error(w, "Failed to read XML file", http.StatusInternalServerError)
-		return
-	}
-
-	var form Form
-	err = xml.Unmarshal(xmlData, &form)
-	if err != nil {
-		http.Error(w, "Failed to parse XML file", http.StatusInternalServerError)
-		return
-	}
-
-	form.schemaFile = filePath
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(form.generateHtmlDoc()))
-}
-
-func (form *Form) generateHtmlDoc() string {
+func generateHtmlDoc(form *form.Form) string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,10 +16,10 @@ func (form *Form) generateHtmlDoc() string {
 </head>
 <body><main class="container">%s</main></body>
 </html>
-`, form.generateHTML())
+`, generateForm(form))
 }
 
-func (field *Field) generateHTML() string {
+func generateField(field *form.Field) string {
 	html := fmt.Sprintf(`<label for="%s">%s</label>`, field.Name, field.Caption)
 	switch field.FieldType {
 	case "Select":
@@ -67,15 +36,15 @@ func (field *Field) generateHTML() string {
 	return html
 }
 
-func (form *Form) generateHTML() string {
-	html := fmt.Sprintf(`<form action="/submit-pdf-form?schema=%s" method="post">`, form.schemaFile)
+func generateForm(form *form.Form) string {
+	html := fmt.Sprintf(`<form action="/submit-pdf-form?schema=%s" method="post">`, form.SchemaFile)
 	for _, field := range form.Fields {
-		html += field.generateHTML()
+		html += generateField(&field)
 	}
 	for _, section := range form.Sections {
 		html += fmt.Sprintf("<fieldset><legend>%s</legend>", section.Title)
 		for _, field := range section.Contents.Fields {
-			html += field.generateHTML()
+			html += generateField(&field)
 		}
 		html += "</fieldset>"
 	}

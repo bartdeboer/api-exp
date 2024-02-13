@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+
+	"github.com/bartdeboer/api-exp/internal/htmlrenderer"
+	"github.com/bartdeboer/api-exp/internal/pdfrenderer"
 )
 
-func addRoutes(mux *http.ServeMux, logger *log.Logger) {
+func addRoutes(mux *http.ServeMux) {
 	mux.Handle("/", serveStaticFiles())
 	mux.HandleFunc("/submit-form", handleFormSubmission)
 	mux.Handle("/hello", handleHello())
-	mux.Handle("/schema/", http.StripPrefix("/schema", http.HandlerFunc(handleSchema)))
-	mux.HandleFunc("/submit-pdf-form", handlePDFFormSubmission)
+	mux.Handle("/schema/", http.StripPrefix("/schema", http.HandlerFunc(htmlrenderer.HandleSchemaForm)))
+	mux.HandleFunc("/submit-pdf-form", pdfrenderer.HandlePDFFormSubmission)
 }
 
 func handleHello() http.Handler {
@@ -30,6 +32,6 @@ func handleFormSubmission(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveStaticFiles() http.Handler {
-	fs := http.FileServer(http.Dir("static"))
+	fs := http.FileServer(http.Dir("./static/"))
 	return http.StripPrefix("/", fs)
 }
