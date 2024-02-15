@@ -1,21 +1,25 @@
 package pdfrenderer
 
 import (
+	"io"
 	"net/http"
 	"strings"
 
 	"github.com/jung-kurt/gofpdf"
-
-	"github.com/bartdeboer/api-exp/internal/form"
 )
 
-func generateField(field *form.Field, pdf *gofpdf.Fpdf, value string) {
+func (form *Form) Output(r *http.Request, w io.Writer) {
+	pdf := form.GeneratePDF(r)
+	pdf.Output(w)
+}
+
+func (field *Field) GeneratePDF(pdf *gofpdf.Fpdf, value string) {
 	pdf.SetFont("Arial", "", 12)
 	pdf.CellFormat(0, 10, field.Caption+": "+value, "0", 1, "", false, 0, "")
 	pdf.Ln(10)
 }
 
-func generateForm(form *form.Form, r *http.Request) *gofpdf.Fpdf {
+func (form *Form) GeneratePDF(r *http.Request) *gofpdf.Fpdf {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 	pdf.SetFont("Arial", "B", 16)
@@ -28,7 +32,7 @@ func generateForm(form *form.Form, r *http.Request) *gofpdf.Fpdf {
 
 	for _, field := range form.Fields {
 		if value, ok := r.Form[field.Name]; ok {
-			generateField(&field, pdf, strings.Join(value, ", "))
+			field.GeneratePDF(pdf, strings.Join(value, ", "))
 		}
 	}
 
@@ -38,7 +42,7 @@ func generateForm(form *form.Form, r *http.Request) *gofpdf.Fpdf {
 		pdf.SetFont("Arial", "", 12)
 		for _, field := range section.Contents.Fields {
 			if value, ok := r.Form[field.Name]; ok {
-				generateField(&field, pdf, strings.Join(value, ", "))
+				field.GeneratePDF(pdf, strings.Join(value, ", "))
 			}
 		}
 	}

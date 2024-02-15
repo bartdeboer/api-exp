@@ -2,11 +2,15 @@ package htmlrenderer
 
 import (
 	"fmt"
-
-	"github.com/bartdeboer/api-exp/internal/form"
+	"io"
+	"net/http"
 )
 
-func generateHtmlDoc(form *form.Form) string {
+func (form *Form) Output(r *http.Request, w io.Writer) {
+	w.Write([]byte(form.GenerateHTMLDoc()))
+}
+
+func (form *Form) GenerateHTMLDoc() string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,10 +20,10 @@ func generateHtmlDoc(form *form.Form) string {
 </head>
 <body><main class="container">%s</main></body>
 </html>
-`, generateForm(form))
+`, form.GenerateHTML())
 }
 
-func generateField(field *form.Field) string {
+func (field *Field) GenerateHTML() string {
 	html := fmt.Sprintf(`<label for="%s">%s</label>`, field.Name, field.Caption)
 	switch field.FieldType {
 	case "Select":
@@ -36,15 +40,15 @@ func generateField(field *form.Field) string {
 	return html
 }
 
-func generateForm(form *form.Form) string {
+func (form *Form) GenerateHTML() string {
 	html := fmt.Sprintf(`<form action="/submit-pdf-form?schema=%s" method="post">`, form.SchemaFile)
 	for _, field := range form.Fields {
-		html += generateField(&field)
+		html += field.GenerateHTML()
 	}
 	for _, section := range form.Sections {
 		html += fmt.Sprintf("<fieldset><legend>%s</legend>", section.Title)
 		for _, field := range section.Contents.Fields {
-			html += generateField(&field)
+			html += field.GenerateHTML()
 		}
 		html += "</fieldset>"
 	}
