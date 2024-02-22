@@ -1,14 +1,15 @@
 package pdfrenderer
 
 import (
-	"io"
 	"net/http"
 	"strings"
 
 	"github.com/jung-kurt/gofpdf"
 )
 
-func (form *Form) Output(r *http.Request, w io.Writer) {
+func (form *Form) Output(r *http.Request, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/pdf")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"form_submission.pdf\"")
 	pdf := form.GeneratePDF(r)
 	pdf.Output(w)
 }

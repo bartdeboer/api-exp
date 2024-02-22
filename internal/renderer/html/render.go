@@ -2,11 +2,11 @@ package htmlrenderer
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 )
 
-func (form *Form) Output(r *http.Request, w io.Writer) {
+func (form *Form) Output(r *http.Request, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "text/html")
 	w.Write([]byte(form.GenerateHTMLDoc()))
 }
 
@@ -41,7 +41,7 @@ func (field *Field) GenerateHTML() string {
 }
 
 func (form *Form) GenerateHTML() string {
-	html := fmt.Sprintf(`<form action="/submit-pdf-form?schema=%s" method="post">`, form.SchemaFile)
+	html := fmt.Sprintf(`<form action="/handle-form?schema=%s&renderer=pdf" method="post">`, form.SchemaFile)
 	for _, field := range form.Fields {
 		html += field.GenerateHTML()
 	}
