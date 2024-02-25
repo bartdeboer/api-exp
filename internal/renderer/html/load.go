@@ -1,26 +1,11 @@
 package htmlrenderer
 
-import (
-	"encoding/xml"
-	"os"
-	"path/filepath"
-)
+import "github.com/bartdeboer/api-exp/internal/form"
 
-func (form *Form) Load(schemaFile string) error {
+func (f *Form) Load(schemaFile string) error {
+	return form.Load(f, schemaFile)
+}
 
-	fullPath := filepath.Join("schema", schemaFile)
-
-	xmlData, err := os.ReadFile(fullPath)
-	if err != nil {
-		return err
-	}
-
-	err = xml.Unmarshal(xmlData, form)
-	if err != nil {
-		return err
-	}
-
-	form.SchemaFile = schemaFile
-
-	return nil
+func (f *Form) AfterLoad(schemaFile string) {
+	f.SchemaFile = schemaFile
 }

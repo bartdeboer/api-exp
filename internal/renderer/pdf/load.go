@@ -1,24 +1,11 @@
 package pdfrenderer
 
-import (
-	"encoding/xml"
-	"os"
-	"path/filepath"
-)
+import "github.com/bartdeboer/api-exp/internal/form"
 
-func (form *Form) Load(schemaFile string) error {
+func (f *Form) Load(schemaFile string) error {
+	return form.Load(f, schemaFile)
+}
 
-	fullPath := filepath.Join("schema", schemaFile)
-
-	xmlData, err := os.ReadFile(fullPath)
-	if err != nil {
-		return err
-	}
-
-	err = xml.Unmarshal(xmlData, &form)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (f *Form) AfterLoad(schemaFile string) {
+	f.SchemaFile = schemaFile
 }
