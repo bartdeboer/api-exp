@@ -8,10 +8,6 @@ import (
 	"github.com/bartdeboer/api-exp/internal/renderer/renderer"
 )
 
-// type Loadable interface {
-// 	AfterLoad(schemaFile string)
-// }
-
 func Load(form renderer.FormRenderer, schemaFile string) error {
 
 	fullPath := filepath.Join("schema", schemaFile)
