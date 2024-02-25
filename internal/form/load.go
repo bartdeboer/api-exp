@@ -4,13 +4,15 @@ import (
 	"encoding/xml"
 	"os"
 	"path/filepath"
+
+	"github.com/bartdeboer/api-exp/internal/renderer/renderer"
 )
 
-type Loadable interface {
-	AfterLoad(schemaFile string)
-}
+// type Loadable interface {
+// 	AfterLoad(schemaFile string)
+// }
 
-func Load(form Loadable, schemaFile string) error {
+func Load(form renderer.FormRenderer, schemaFile string) error {
 
 	fullPath := filepath.Join("schema", schemaFile)
 
